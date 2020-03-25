@@ -1,0 +1,109 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="RU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Авторизация</title>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,500,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link href="../../css/style_login.css" type="text/css" rel="stylesheet">
+    <link href="../../css/loading.css" type="text/css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+</head>
+<body style="background-image: url('../../img/wave.svg'); background-position: bottom center; background-repeat: no-repeat; background-attachment: fixed; ">
+    <div class="body">
+        <div class="body__logo">
+            <img class="body_logo_img" src="../../img/logo_left.png" alt="">
+        </div>
+        <div class="body__left">
+            <div class="body__avt">
+                <div class="body__logo_sm">
+                    <img src="../../img/logo_in.svg" alt="">
+                </div>
+                <div class="body__avt_w">
+                    <div class="body__title">Авторизация</div>
+                    <div class="body__inpt">
+                        <p class="body__sub_title">Логин</p>
+                        <input class="body__input" type="text" placeholder="Ввидите логин" id="logininput">
+                    </div>
+                    <div class="body__inpt">
+                        <p class="body__sub_title">Пароль</p>
+                        <input class="body__input" type="password" placeholder="Ввидите пароль" id="passwordinput">
+                    </div>
+                    <div class="body__buttons">
+                        <button class="body__ent btn btn-default has-spinner" id="LoginButton" type="submit">Войти</button>
+                        <a href="#" class="body__forget">Забыли пароль?</a>
+                    </div>
+
+                    <div style="display:none;" id="BadToken">
+                        <p>Не удалось найти базу по заданному токену.</p>
+                    </div>
+                    <div style="display:none;" id="BadLogin">
+                        <p>Неправильно введен логин или пароль.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+    $('#LoginButton').on('click', function () {
+
+        var btn = $(this);
+        $(btn).buttonLoader('start');
+
+        $('#BadLogin').css('display', 'none');
+        $('#BadToken').css('display', 'none');
+
+        let url = '@Url.Action("TryLogin", "Delans")';
+        let url2 = '@Url.Action("Login", "Delans")';
+        let alogin = $('#logininput').val();
+        let apassword = $('#passwordinput').val();
+        $.get(url, { login: alogin, password: apassword }, function (data) {
+            if (data == "BadLogin") {
+                $('#BadLogin').css('display', 'block');
+                $(btn).buttonLoader('stop');
+            }
+            else if (data == "BadToken") {
+                $('#BadToken').css('display', 'block');
+                $(btn).buttonLoader('stop');
+            }
+            else {
+                window.location.href = url2;
+            }
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    (function ($) {
+        $.fn.buttonLoader = function (action) {
+            var self = $(this);
+            if (action == 'start') {
+                if ($(self).attr("disabled") == "disabled") {
+                    e.preventDefault();
+                }
+                $('.has-spinner').attr("disabled", "disabled");
+                $(self).attr('data-btn-text', $(self).text());
+                $(self).html('<span class="spinner"><i class="fa fa-spinner fa-spin"></i></span>Loading');
+                $(self).addClass('active');
+            }
+            if (action == 'stop') {
+                $(self).html($(self).attr('data-btn-text'));
+                $(self).removeClass('active');
+                $('.has-spinner').removeAttr("disabled");
+            }
+        }
+    })(jQuery);
+</script>

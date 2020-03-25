@@ -1,0 +1,109 @@
+﻿@model Delans.Models.GetShipmentsResponse
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>ЛК Клиента</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    @*<link href="Ubuntu:300,400,400i,500,500i,700&amp;subset=cyrillic" type="text/css" rel="stylesheet" />*@
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/css/bootstrap-datepicker.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../css/bootstrap.min.css">
+    <link rel="stylesheet" href="../../css/main.css">
+</head>
+
+<body>
+    <!-- header -->
+    <header class="container-header bg-blue">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <div class="nav-h1">
+                    <a class="navbar-brand" href="#">ЛК Клиента</a>
+                </div>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-lg-4 mr-05 ml-05">
+                        <li class="nav-item">
+                            <a class="nav-link underline" onclick="GetBody(this.id)" href="#" id="ShipmentEvent">Заказы</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link underline" href="#">Новый заказ</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link underline" onclick="GetBody(this.id)" href="#" id="CalculatorEvent">Калькулятор</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link underline" href="#">Отчетность</a>
+                        </li>
+                    </ul>
+
+                    <div class="header-right">
+                        <span class="diveder-vertikal"></span>
+                        <a href="/Delans/Logout" class="border-thin">Выйти</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <!-- //header -->
+
+    <div id="MainBody">
+        @*<div id="MainBody_Header">
+        </div>
+        <div id="MainBody_Body">
+            <p>Подождите, загружаем заказы</p>
+        </div>*@
+    </div>
+
+            <footer class="footer">
+                <div class="container">
+                    <div class="row">
+                        <div class="copyright col">
+                            <p class="copy-right-item">Все права защищены © 2018 Delans.</p>
+                        </div>
+                        <div class="confinencial col">
+                            <a href="#" target="_blank">Политика конфиденциальности</a>
+                        </div>
+                    </div>
+
+                </div>
+            </footer>
+
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.7.1/js/bootstrap-datepicker.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+</body>
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#MainBody").load('@Url.Action("GetTableBody_Header", "Delans")');
+    });
+</script>
+
+
+<script type="text/javascript">
+    function GetBody(EventCallerId) {
+        let elem = $('#MainBody');
+        if (EventCallerId == "CalculatorEvent") {
+            elem.load('@Url.Action("GetCalculatorBody", "Delans")');
+        }
+        else if (EventCallerId == "ShipmentEvent") {
+
+            $("#MainBody").load('@Url.Action("GetTableBody_Header", "Delans")');
+
+        }
+    }
+</script>

@@ -1,0 +1,157 @@
+﻿
+@model Delans.Models.GetShipmentsResponse
+@{
+    Layout = null;
+}
+
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm bg-white blocksearch">
+                <span>Начиная с:</span>
+                <input class="form-control input1" data-date-format="dd/mm/yyyy" id="datepicker">
+                <a id="RefreshTable" class="pinkbutton" style="margin-right: 1rem;">Обновить</a>
+                <a id="GetInvoice" class="pinkbutton" style="margin-right: 1rem;">Печать накладной</a>
+                <a id="GetStickers" class="pinkbutton" style="margin-right: 1rem;">Печать стикера</a>
+                <a class="pinkbutton">Сохранить в Excel</a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- search -->
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm bg-white blocksearch">
+                <input type="text" class="form-control input1" placeholder="Поиск по таблице" id="search-text" onkeyup="tableSearch()" style="flex-grow:1;">
+                <a id="clearButton" class="pinkbutton">Очистить</a>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //search -->
+<!-- table -->
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm blocktable">
+                <div class="">
+
+                    <table id="info-table" cellspacing="0" class="table table-bordered table-checks">
+                        <tbody>
+                            <tr>
+                                <th style="width: 5%"><input type="checkbox" onclick="toggle(this);" /></th>
+                                <th style="width: 5%">Дата доставки</th>
+                                <th style="width: 5%">Номер доставки</th>
+                                <th style="width: 5%">Номер накладной</th>
+                                <th style="width: 15%">Получатель</th>
+                                <th style="width: 10%">Город</th>
+                                <th style="width: 23%">Адрес</th>
+                                <th style="width: 10%">Статус</th>
+                                <th style="width: 10%">Интервал доставки</th>
+                                <th style="width: 7%">Вес</th>
+                                <th style="width: 10%">Сумма</th>
+                            </tr>
+
+
+                            @if (Model.Shipments != null)
+                            {
+                                foreach (var item in Model.Shipments)
+                                {
+                                    <tr>
+                                        <td class="centermiddle"><input type="checkbox" value="@item.ShipmentNumber"></td>
+                                        <td>@item.Date</td>
+                                        <td><a onclick="ShipmentDetails(this.id, this.text)" id="@item.ClientShipmentNumber">@item.Number</a></td>
+                                        <td>@item.ShipmentNumber</td>
+                                        <td>@item.Recipient</td>
+                                        <td>@item.Recipient_City</td>
+                                        <td>@item.Recipient_FullAddress</td>
+                                        <td>@item.Is_delivered</td>
+                                        <td>@item.DesiredDate</td>
+                                        <td class="alingright">@item.Weight</td>
+                                        <td class="alingright">@item.Total</td>
+                                    <tr class="orderdesc" id="@item.Number">
+                                    </tr>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //table -->
+
+<script src="../../js/searchtable.js"></script>
+
+<script type="text/javascript">
+    $('#datepicker').datepicker({
+        weekStart: 1,
+        daysOfWeekHighlighted: "6,0",
+        autoclose: true,
+        todayHighlight: true,
+    });
+    $('#datepicker').datepicker("setDate", new Date());
+</script>
+
+<script type="text/javascript">
+    function ShipmentDetails(id, text) {
+                let elem = $('#' + text);
+                if (elem.css('display') == 'table-row') {
+                    elem.css('display', 'none');
+                } else {
+                    let url = '@Url.Action("DetailsInfo", "Delans")';
+                    elem.load(url, { number: id });
+                    elem.css('display', 'table-row');
+                }
+            }
+</script>
+
+<script type="text/javascript">
+    document.getElementById("GetInvoice").onclick = function () {
+        let arrch = FindChecked();
+        if (arrch.length > 0) {
+            $.get("/Delans/PrintInvoices", $.param({ ExtNumbers: arrch }, true), function (pdfbase64) {
+                PrintFromBase64(pdfbase64);
+            });
+        }
+    };
+
+    document.getElementById("GetStickers").onclick = function () {
+        let arrch = FindChecked();
+        if (arrch.length > 0) {
+            $.get("/Delans/PrintStickers", $.param({ ExtNumbers: arrch }, true), function (pdfbase64) {
+                PrintFromBase64(pdfbase64);
+            });
+        }
+    };
+
+    function FindChecked() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let arrnum = new Array();
+        for (var i = 1; i < checkboxes.length; i++) {
+            if (checkboxes[i].checked == true) {
+                arrnum.push(checkboxes[i].value);
+            }
+        }
+
+        return arrnum;
+    }
+
+    function PrintFromBase64(pdfbase64) {
+        if (pdfbase64) {
+            var byteCharacters = atob(pdfbase64);
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            var byteArray = new Uint8Array(byteNumbers);
+            var file = new Blob([byteArray], { type: 'application/pdf;base64' });
+            var fileURL = URL.createObjectURL(file);
+            window.open(fileURL, "Print");
+        }
+    }
+
+</script>

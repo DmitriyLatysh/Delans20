@@ -1,0 +1,109 @@
+﻿@{
+    Layout = null;
+}
+
+    <div id="MainBody_Header">
+        <section>
+            <link href="../../css/loading.css" type="text/css" rel="stylesheet">
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm bg-white blocksearch">
+                        <span>Начиная с:</span>
+                        <input class="form-control input1" data-date-format="dd/mm/yyyy" id="datepicker">
+                        <a id="RefreshTable" class="pinkbutton btn btn-default has-spinner" style="margin-right: 1rem;">Обновить</a>
+                        <a id="GetInvoice" class="pinkbutton" style="margin-right: 1rem;">Печать накладной</a>
+                        <a id="GetStickers" class="pinkbutton" style="margin-right: 1rem;">Печать стикера</a>
+                        <a class="pinkbutton">Сохранить в Excel</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- search -->
+        <section>
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm bg-white blocksearch">
+                        <input type="text" class="form-control input1" placeholder="Поиск по таблице" id="search-text" onkeyup="tableSearch()" style="flex-grow:1;">
+                        <a id="clearButton" class="pinkbutton">Очистить</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+        <div id="MainBody_Body">
+            <p>Подождите, загружаем заказы</p>
+        </div>
+
+        <script type="text/javascript">
+            $('#datepicker').datepicker({
+                weekStart: 1,
+                daysOfWeekHighlighted: "6,0",
+                autoclose: true,
+                todayHighlight: true,
+            });
+            $('#datepicker').datepicker("setDate", new Date());
+        </script>
+
+        <script type="text/javascript">
+            document.getElementById("GetInvoice").onclick = function () {
+                let arrch = FindChecked();
+                if (arrch.length > 0) {
+                    $.get("/Delans/PrintInvoices", $.param({ ExtNumbers: arrch }, true), function (pdfbase64) {
+                        PrintFromBase64(pdfbase64);
+                    });
+                }
+            };
+
+            document.getElementById("GetStickers").onclick = function () {
+                let arrch = FindChecked();
+                if (arrch.length > 0) {
+                    $.get("/Delans/PrintStickers", $.param({ ExtNumbers: arrch }, true), function (pdfbase64) {
+                        PrintFromBase64(pdfbase64);
+                    });
+                }
+            };
+
+            function FindChecked() {
+                var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                let arrnum = new Array();
+                for (var i = 1; i < checkboxes.length; i++) {
+                    if (checkboxes[i].checked == true) {
+                        arrnum.push(checkboxes[i].value);
+                    }
+                }
+
+                return arrnum;
+            }
+
+            function PrintFromBase64(pdfbase64) {
+                if (pdfbase64) {
+                    var byteCharacters = atob(pdfbase64);
+                    var byteNumbers = new Array(byteCharacters.length);
+                    for (var i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    var byteArray = new Uint8Array(byteNumbers);
+                    var file = new Blob([byteArray], { type: 'application/pdf;base64' });
+                    var fileURL = URL.createObjectURL(file);
+                    window.open(fileURL, "Print");
+                }
+            }
+        </script>
+      
+<script type="text/javascript">
+    document.getElementById("RefreshTable").onclick = function () {
+
+        alert($('#datepicker').datepicker('getDate'));
+
+        let url = '@Url.Action("GetTableBody_Body", "Delans")';
+        $('#MainBody_Body').load(url, { Start: $("#datepicker").val()});
+
+    };
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#MainBody_Body").load('@Url.Action("GetTableBody_Body", "Delans")');
+    });
+</script>

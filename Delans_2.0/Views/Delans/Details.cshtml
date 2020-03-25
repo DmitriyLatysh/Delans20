@@ -1,0 +1,23 @@
+﻿@model Delans.Models.GetHistoryStatusInvoiceResponse
+@{
+    Layout = null;
+}
+
+<td colspan="10">
+    <b>История статусов:</b>
+    @if (Model.Success && Model.List.Length > 0 && Model.List[0].History.Length > 0)
+    {
+        foreach (var str in Model.List[0].History)
+        {
+            <p>@str.Is_Delivered - @str.Date</p>
+        }
+    }
+    else
+    {
+        <p>"Не удалось получить историю грузов" </p>
+    }
+
+
+
+
+</td>
