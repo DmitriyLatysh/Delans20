@@ -94,7 +94,7 @@
 <script type="text/javascript">
     document.getElementById("RefreshTable").onclick = function () {
 
-        alert($('#datepicker').datepicker('getDate'));
+        //alert($('#datepicker').datepicker('getDate'));
 
         let url = '@Url.Action("GetTableBody_Body", "Delans")';
         $('#MainBody_Body').load(url, { Start: $("#datepicker").val()});
